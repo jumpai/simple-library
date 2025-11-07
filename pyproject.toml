@@ -16,3 +16,8 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "httpx"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["tests*", "frontend*", "scripts*", "dist*", "node_modules*"]
