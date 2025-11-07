@@ -13,4 +13,5 @@ def default_catalog() -> Sequence[dict[str, str]]:
         {"isbn": "9780307474278", "title": "The Girl with the Dragon Tattoo", "author": "Stieg Larsson"},
         {"isbn": "9780747532743", "title": "Harry Potter and the Philosopher's Stone", "author": "J.K. Rowling"},
         {"isbn": "9780061120084", "title": "To Kill a Mockingbird", "author": "Harper Lee"},
+        {"isbn": "9780143127742", "title": "Gen PhyI", "author": "Einstein"},
     ]
