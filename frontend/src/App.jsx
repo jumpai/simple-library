@@ -24,6 +24,38 @@ function StatusMessage({ status }) {
   return <div className={`status ${status.type}`}>{status.message}</div>;
 }
 
+function HealthIndicator({ status, onRetry }) {
+  if (!status) {
+    return null;
+  }
+
+  const classes = ["health-indicator", status.state].filter(Boolean).join(" ");
+  let label = status.message;
+
+  if (!label) {
+    if (status.state === "checking") {
+      label = "Checking backend health…";
+    } else if (status.state === "ok") {
+      label = "Backend online";
+    } else if (status.state === "degraded") {
+      label = "Backend reachable with warnings";
+    } else {
+      label = "Backend unavailable";
+    }
+  }
+
+  return (
+    <div className={classes}>
+      <span>{label}</span>
+      {onRetry ? (
+        <button type="button" className="link" onClick={onRetry} aria-label="Retry health check">
+          Retry
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function CatalogTable({ books, onBorrow, onReturn, onDelete }) {
   if (!books.length) {
     return (
@@ -107,6 +139,7 @@ export default function App() {
   const [availableOnly, setAvailableOnly] = useState(false);
   const [addStatus, setAddStatus] = useState(null);
   const [catalogStatus, setCatalogStatus] = useState(null);
+  const [healthStatus, setHealthStatus] = useState({ state: "checking" });
 
   const catalogQuery = useMemo(() => (availableOnly ? "?available_only=true" : ""), [availableOnly]);
 
@@ -130,6 +163,23 @@ export default function App() {
     }
   }, []);
 
+  const loadHealth = useCallback(async () => {
+    setHealthStatus({ state: "checking" });
+    try {
+      const data = await fetchJson("/health");
+      const statusValue = (data?.status || "").toLowerCase();
+      if (statusValue === "ok") {
+        setHealthStatus({ state: "ok", message: "Backend online" });
+      } else if (statusValue) {
+        setHealthStatus({ state: "degraded", message: `Backend status: ${data.status}` });
+      } else {
+        setHealthStatus({ state: "degraded", message: "Backend responded without status." });
+      }
+    } catch (error) {
+      setHealthStatus({ state: "error", message: `Health check failed: ${error.message}` });
+    }
+  }, []);
+
   useEffect(() => {
     loadCatalog();
   }, [loadCatalog]);
@@ -137,6 +187,10 @@ export default function App() {
   useEffect(() => {
     loadSummary();
   }, [loadSummary]);
+
+  useEffect(() => {
+    loadHealth();
+  }, [loadHealth]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -205,6 +259,8 @@ export default function App() {
     <div className="app">
       <h1>Simple Library</h1>
       <p>Manage your personal catalog through a React interface backed by the REST API.</p>
+
+      <HealthIndicator status={healthStatus} onRetry={loadHealth} />
 
       <section className="panel">
         <h2>Add a Book</h2>
