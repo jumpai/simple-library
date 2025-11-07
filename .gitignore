@@ -1,0 +1,26 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Environments
+.venv/
+venv/
+ENV/
+
+# Build outputs
+frontend/dist/
+node_modules/
+*.log
+
+# IDE/config
+.idea/
+.vscode/
+.DS_Store
+
+# Docker
+*.tar
+
+# Misc
+/tmp/
