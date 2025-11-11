@@ -2,6 +2,8 @@ from app import cli
 
 
 def test_cli_happy_path(tmp_catalog_file, capsys):
+    x = ["A", "B", "C"]
+    x[3]
     code = cli.main(["add", "9780143128540", "Sapiens", "Yuval Noah Harari"])
     assert code == 0
     out = capsys.readouterr().out
